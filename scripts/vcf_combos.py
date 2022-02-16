@@ -155,7 +155,9 @@ def work(vcf_in, prefix):
     for key in output:
         output_list.append(key)
 
-    assert output_list == sorted(output_list)
+    # Make sure the output list is still sorted
+    assert output_list == sorted(output_list, key=lambda x: int(x.split('_')[0]))
+
     results = wrap(output_list)
 
     unique_pairs = []
