@@ -1,9 +1,11 @@
-containers = {"debian": "docker://debian:latest"}
-default = {"setting1": "common.smk", "setting2": "common.smk", "setting3": "common.smk"}
+containers = {"pysam": "docker://quay.io/biocontainers/pysam:0.18.0--py39h20405f9_0"}
+default = {}
 
 
-def get_outfile():
-    return "outputfile.txt"
+def get_vcf(wildcards):
+    print(f"Function get_vcf: {wildcards}")
+    print(pep.sample_table.loc[wildcards.sample, "vcf"])
+    return pep.sample_table.loc[wildcards.sample, "vcf"]
 
 
 def get_forward(wildcards):
