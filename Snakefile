@@ -20,9 +20,26 @@ rule all:
         samples=expand("{sample}/0_A.vcf", sample=pep.sample_table["sample_name"]),
 
 
-rule vcf_combo:
+rule exclude_homref:
     input:
         vcf=get_vcf,
+    output:
+        vcf="{sample}/{sample}_no_homref.vcf",
+    log:
+        "log/{sample}_exclude_homref.txt",
+    container:
+        containers["bcftools"]
+    shell:
+        """
+        bcftools view \
+            --genotype ^hom \
+            {input.vcf} > {output.vcf} 2> {log}
+        """
+
+
+rule vcf_combo:
+    input:
+        vcf=rules.exclude_homref.output.vcf,
         src=srcdir("scripts/vcf_combos.py"),
     output:
         # Just one of the possible output files, to trigger the all rule

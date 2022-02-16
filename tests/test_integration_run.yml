@@ -13,6 +13,7 @@
   files:
     - path: sample1/0_A.vcf
     - path: sample1/0_B.vcf
+    - path: sample1/sample1_no_homref.vcf
 
 - name: integration-unphased
   tags:
