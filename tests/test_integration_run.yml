@@ -12,3 +12,4 @@
       --snakefile Snakefile
   files:
     - path: sample1/0_A.vcf
+    - path: sample1/0_B.vcf
