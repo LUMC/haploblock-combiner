@@ -11,8 +11,8 @@
       --config pepfile=tests/pep/project_config_empty.yaml
       --snakefile Snakefile
   files:
-    - path: sample1/0_A.vcf
-    - path: sample1/0_B.vcf
+    - path: sample1/combinations/0_A.vcf
+    - path: sample1/combinations/0_B.vcf
     - path: sample1/sample1_no_homref.vcf
 
 - name: integration-unphased
@@ -28,8 +28,8 @@
       --config pepfile=tests/pep/project_config_unphased.yaml
       --snakefile Snakefile
   files:
-    - path: sample2/0_A.vcf
-    - path: sample2/0_B.vcf
+    - path: sample2/combinations/0_A.vcf
+    - path: sample2/combinations/0_B.vcf
 
 - name: integration-phased
   tags:
@@ -44,7 +44,7 @@
       --config pepfile=tests/pep/project_config_phased.yaml
       --snakefile Snakefile
   files:
-    - path: sample3/0_A.vcf
-    - path: sample3/1_A.vcf
-    - path: sample3/0_B.vcf
-    - path: sample3/1_B.vcf
+    - path: sample3/combinations/0_A.vcf
+    - path: sample3/combinations/1_A.vcf
+    - path: sample3/combinations/0_B.vcf
+    - path: sample3/combinations/1_B.vcf

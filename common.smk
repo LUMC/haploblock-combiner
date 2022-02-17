@@ -7,3 +7,14 @@ default = {}
 
 def get_vcf(wildcards):
     return pep.sample_table.loc[wildcards.sample, "vcf"]
+
+
+def gather_vcf_combo(wildcards):
+    checkpoint_output = checkpoints.vcf_combo.get(**wildcards).output[0]
+
+    return expand(
+        "{sample}/combinations/{i}_{ab}.vcf",
+        sample=wildcards.sample,
+        ab=["A", "B"],
+        i=glob_wildcards(os.path.join(checkpoint_output, "{i}_A.vcf")).i,
+    )

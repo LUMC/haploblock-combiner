@@ -12,4 +12,4 @@
   stdout:
     contains:
      - sample1/sample1_no_homref.vcf
-     - sample1/0_A.vcf
+     - sample1/combinations
