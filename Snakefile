@@ -20,6 +20,7 @@ rule all:
         samples=expand("{sample}/0_A.vcf", sample=pep.sample_table["sample_name"]),
 
 
+# TODO: Fix bcftools filter to use --include 'GT[*]="alt"'
 rule exclude_homref:
     input:
         vcf=get_vcf,
@@ -50,8 +51,7 @@ rule vcf_combo:
         containers["pysam"]
     shell:
         """
-        folder=$(dirname {output.fname})
-        mkdir -p $folder
+        mkdir -p {wildcards.sample}
         python {input.src} \
-            {input.vcf} $folder 2>&1 > {log}
+            {input.vcf} {wildcards.sample} 2>&1 > {log}
         """
