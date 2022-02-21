@@ -20,7 +20,6 @@ rule all:
         fasta=expand("{sample}/fasta_files.txt", sample=pep.sample_table["sample_name"]),
 
 
-# TODO: Fix bcftools filter to use --include 'GT[*]="alt"'
 rule exclude_homref:
     input:
         vcf=get_vcf,
@@ -33,7 +32,7 @@ rule exclude_homref:
     shell:
         """
         bcftools view \
-            --genotype ^hom \
+            --include 'GT[*]="alt"' \
             {input.vcf} > {output.vcf} 2> {log}
         """
 
