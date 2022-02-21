@@ -179,8 +179,8 @@ def work(vcf_in, prefix):
             unique_pairs.append((path, alt_path))
 
     for index, (path, alt_path) in enumerate(unique_pairs):
-        vcf1_out = VariantFile(f"{prefix}/{index}_A.vcf", "w", header=vcf_in.header)
-        vcf2_out = VariantFile(f"{prefix}/{index}_B.vcf", "w", header=vcf_in.header)
+        vcf1_out = VariantFile(f"{prefix}/{index}_A.vcf.gz", "w", header=vcf_in.header)
+        vcf2_out = VariantFile(f"{prefix}/{index}_B.vcf.gz", "w", header=vcf_in.header)
 
         for ps in path:
             for v in output[ps]:

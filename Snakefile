@@ -17,7 +17,7 @@ config = default
 
 rule all:
     input:
-        samples=expand("{sample}/filelist.txt", sample=pep.sample_table["sample_name"]),
+        fasta=expand("{sample}/fasta_files.txt", sample=pep.sample_table["sample_name"]),
 
 
 # TODO: Fix bcftools filter to use --include 'GT[*]="alt"'
@@ -58,15 +58,42 @@ checkpoint vcf_combo:
 
 rule apply_variants:
     input:
-        gather_vcf_combo,
+        vcf="{sample}/combinations/{i}_{ab}.vcf.gz",
+        ref=config["reference"],
     output:
-        "{sample}/filelist.txt",
+        fasta="{sample}/fasta/{i}_{ab}_all.fasta",
+        tbi="{sample}/combinations/{i}_{ab}.vcf.gz.tbi",
     log:
-        "log/{sample}_apply_variants.txt",
+        "log/{sample}_fasta_{i}_{ab}.txt",
     container:
         containers["bcftools"]
     shell:
         """
+        # Create the output folder
+        mkdir -p $(dirname {output.fasta}) 2> {log}
+
+        # Index the vcf input file
+        tabix --force --preset vcf {input.vcf}
+
+        cat {input.ref} | \
+        bcftools consensus \
+            --haplotype A \
+            {input.vcf} > {output.fasta} 2>> {log}
+        """
+
+
+rule gather_fasta:
+    input:
+        gather_final_output,
+    output:
+        "{sample}/fasta_files.txt",
+    log:
+        "log/{sample}_gather.txt",
+    container:
+        containers["bcftools"]
+    shell:
+        """
+        rm -f {output}
         for file in {input}; do
             echo $file >> {output}
         done

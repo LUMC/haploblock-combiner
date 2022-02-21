@@ -28,3 +28,7 @@ of priority.
 2. Setting specified in the PEP project configuration, under the key
    `snakemake-pipeline`
 3. The default settings for the pipeline, as specified in the `common.smk` file
+
+## Usage
+The following settings are required:
+`--config pepfile=pepfile.yml reference=/path/to/ref.fa`
