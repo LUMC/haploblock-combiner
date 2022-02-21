@@ -33,11 +33,13 @@
       --jobs 1
       --latency-wait 120
       --use-singularity --singularity-args ' --cleanenv --bind /tmp'
-      --config pepfile=tests/pep/project_config_unphased.yaml
+      --config
+        pepfile=tests/pep/project_config_unphased.yaml
+        reference=tests/data/ref.fa
       --snakefile Snakefile
   files:
-    - path: sample2/combinations/0_A.vcf
-    - path: sample2/combinations/0_B.vcf
+    - path: sample2/combinations/0_A.vcf.gz
+    - path: sample2/combinations/0_B.vcf.gz
 
 - name: integration-phased
   tags:
@@ -49,10 +51,18 @@
       --jobs 1
       --latency-wait 120
       --use-singularity --singularity-args ' --cleanenv --bind /tmp'
-      --config pepfile=tests/pep/project_config_phased.yaml
+      --config
+        pepfile=tests/pep/project_config_phased.yaml
+        reference=tests/data/ref.fa
       --snakefile Snakefile
   files:
-    - path: sample3/combinations/0_A.vcf
-    - path: sample3/combinations/1_A.vcf
-    - path: sample3/combinations/0_B.vcf
-    - path: sample3/combinations/1_B.vcf
+    - path: sample3/combinations/0_A.vcf.gz
+    - path: sample3/combinations/1_A.vcf.gz
+    - path: sample3/combinations/0_B.vcf.gz
+    - path: sample3/combinations/1_B.vcf.gz
+    - path: sample3/fasta_files.txt
+      contains:
+        - 0_A_all.fasta
+        - 1_A_all.fasta
+        - 0_B_all.fasta
+        - 1_B_all.fasta

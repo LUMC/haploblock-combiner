@@ -6,7 +6,9 @@
       --dryrun
       --reason
       --printshellcmds
-      --config pepfile=tests/pep/project_config_empty.yaml
+      --config
+        pepfile=tests/pep/project_config_empty.yaml
+        reference=tests/data/ref.fa
       --snakefile Snakefile
   exit_code: 0
   stdout:
