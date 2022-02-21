@@ -62,6 +62,8 @@ rule apply_variants:
     output:
         fasta="{sample}/fasta/{i}_{ab}_all.fasta",
         tbi="{sample}/combinations/{i}_{ab}.vcf.gz.tbi",
+    params:
+        region=config.get("region", ""),
     log:
         "log/{sample}_fasta_{i}_{ab}.txt",
     container:
@@ -74,10 +76,17 @@ rule apply_variants:
         # Index the vcf input file
         tabix --force --preset vcf {input.vcf}
 
-        cat {input.ref} | \
-        bcftools consensus \
-            --haplotype A \
-            {input.vcf} > {output.fasta} 2>> {log}
+        if [ -z {params.region} ]; then
+            cat {input.ref} |
+            bcftools consensus \
+                --haplotype A \
+                {input.vcf} > {output.fasta} 2>> {log}
+        else
+            samtools faidx {input.ref} {params.region} |
+            bcftools consensus \
+                --haplotype A \
+                {input.vcf} > {output.fasta} 2>> {log}
+        fi
         """
 
 
