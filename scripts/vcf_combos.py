@@ -1,82 +1,70 @@
 from pysam import VariantFile
 import argparse
+import logging
 import pprint
+
 
 # TODO: how to deal with gene deletion and duplication?!
 
 
-def walk(alleles, stack, results, debug=False):
-    if debug:
-        print()
-        print("Walk input:", alleles)
-        print("Stack:", stack)
+def walk(alleles, stack, results):
+    logging.debug(f"Walk input:{alleles}")
+    logging.debug(f"Stack:{stack}")
     if not alleles:
-        if debug:
-            print("No remaining input")
-            print("Storing stack to results:", stack)
+        logging.debug("No remaining input")
+        logging.debug(f"Storing stack to results:{stack}")
         results.append(stack.copy())
         if stack:
             p = stack.pop()
-            if debug:
-                print(f"Popped: '{p}' at no input")
+            logging.debug(f"Popped: '{p}' at no input")
         return
 
     pos, suffix = alleles[0].split("_")
 
-    if debug:
-        print(f"Put element '{pos}_{suffix}' on stack")
+    logging.debug(f"Put element '{pos}_{suffix}' on stack")
     stack.append(alleles[0])
 
     if len(alleles) > 1:
         pos_next, suffix_next = alleles[1].split("_")
     else:
-        if debug:
-            print("We are at last input")
-            print("Storing stack to results:", stack)
+        logging.debug("We are at last input")
+        logging.debug(f"Storing stack to results: {stack}")
         results.append(stack.copy())
         p = stack.pop()
-        if debug:
-            print(f"Popped: '{p}' at last input")
+        logging.debug(f"Popped: '{p}' at last input")
         return
 
     if pos == pos_next:
         # If next is paired allele, skip over that
-        if debug:
-            print(f"Going to skip (pos={pos}) ...")
-        walk(alleles[2:], stack, results, debug)
-        if debug:
-            print(f"After skip (pos={pos}) ...")
+        logging.debug(f"Going to skip (pos={pos}) ...")
+        walk(alleles[2:], stack, results)
+        logging.debug(f"After skip (pos={pos}) ...")
 
         if stack and stack[-1] == f"{pos}_{suffix}":
             p = stack.pop()
-            if debug:
-                print(f"Popped: '{p}' at {pos}")
+            logging.debug(f"Popped: '{p}' at {pos}")
 
-    if debug:
-        print(f"Going to walk next (pos={pos}) ...")
-    walk(alleles[1:], stack, results, debug)
+    logging.debug(f"Going to walk next (pos={pos}) ...")
+    walk(alleles[1:], stack, results)
 
     # Only remove elements from stack that lay beyond
     if stack and stack[-1].split("_")[0] >= pos:
         p = stack.pop()
-        if debug:
-            print(f"Popped: '{p}' at end of element '{pos}_{suffix}'")
+        logging.debug(f"Popped: '{p}' at end of element '{pos}_{suffix}'")
 
 
-def wrap(alleles, debug=False):
+def wrap(alleles):
 
     results = []
-    walk(alleles, [], results, debug)
+    walk(alleles, [], results)
 
     lengths = set()
     for path in results:
-        if debug:
-            print("path ", results.index(path))
-            print(len(path), path)
+        logging.debug(f"path {results.index(path)}")
+        logging.debug(f"{len(path)} {path}")
         lengths.add(len(path))
 
-    if debug:
-        print(len(results))
+    logging.debug(len(results))
 
     # Make sure all paths have the same number of phase sets
     assert len(lengths) == 1
@@ -107,10 +95,14 @@ def work(vcf_in, prefix):
             output[f"{rec.pos}_X"] = []
 
     for rec in vcf_in.fetch():
-        msg = f"{rec.chrom}:{rec.pos}"
+        logging.debug(f"{rec.chrom}:{rec.pos}")
+        if rec.info["AC"] not in [(1,), (2,)]:
+            msg = f"{rec.chrom}:{rec.pos} has AC={rec.info['AC']}, skipping"
+            logging.warning(msg)
+            continue
+
         assert rec.info["AC"] in [(1,), (2,)], msg
 
-        # print(rec)
         sample = rec.samples[0]
 
         # Assume these formats
@@ -131,8 +123,6 @@ def work(vcf_in, prefix):
                 allele = "A"
             elif sample["GT"] == (0, 1):
                 allele = "B"
-
-            # print(sample['GT'])
 
             ps_allele = f"{ps}_{allele}"
             output[ps_allele].append(rec)
@@ -164,14 +154,14 @@ def work(vcf_in, prefix):
     unique_pairs = []
     for path in results:
 
-        print(path)
+        logging.info(path)
         alt_path = []
         for ps in path:
             m = {"A": "B", "B": "A", "HET": "X", "X": "HET", "HOM": "HOM"}
             pos, suffix = ps.split("_")
             alt = f"{pos}_{m[suffix]}"
             alt_path.append(alt)
-            print(ps, alt)
+            logging.info(f"{ps} {alt}")
 
         if (path, alt_path) not in unique_pairs and (
             alt_path,
@@ -202,49 +192,26 @@ def test():
     assert wrap(["1_A", "1_B", "2_HOM"]) == [["1_A", "2_HOM"], ["1_B", "2_HOM"]]
 
 
-def main():
-    parser = argparse.ArgumentParser(description="Validate pairs.")
-    parser.add_argument("filename", help="vcf file")
-    parser.add_argument("output", help="output dir file")
-    args = parser.parse_args()
-
+def main(args):
+    test()
     vcf_in = VariantFile(args.filename)
     work(vcf_in, args.output)
 
-    alleles = [
-        "1_A",
-        "1_B",
-        "2_HOM",
-        "3_HOM",
-        "4_HOM",
-        "5_HOM",
-        "6_A",
-        "6_B",
-        "7_HOM",
-        "8_A",
-        "8_B",
-        "9_HOM",
-        "10_HOM",
-        "11_HOM",
-        "12_A",
-        "12_B",
-        "13_HOM",
-        "14_HOM",
-        "15_HOM",
-        "16_HOM",
-        "17_HET",
-        "17_X",
-        "18_HOM",
-        "19_HOM",
-        "20_HOM",
-        "21_A",
-        "21_B",
-    ]
-
-    # results = wrap(alleles)
-    # pprint.pprint(results)
-
 
 if __name__ == "__main__":
-    test()
-    main()
+    parser = argparse.ArgumentParser(description="Validate pairs.")
+    parser.add_argument("filename", help="vcf file")
+    parser.add_argument("output", help="output dir file")
+    parser.add_argument('--log-level', choices=['DEBUG', 'INFO', 'WARN',
+    'ERROR'], default='WARN')
+    args = parser.parse_args()
+
+    log_levels = {
+            'DEBUG': logging.DEBUG,
+            'INFO': logging.INFO,
+            'WARN': logging.WARN,
+            'ERROR': logging.ERROR
+    }
+    logging.basicConfig(level=log_levels[args.log_level])
+
+    main(args)
