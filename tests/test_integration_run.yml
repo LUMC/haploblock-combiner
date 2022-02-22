@@ -121,6 +121,13 @@
     - path: log/sample3_fasta_0_A.txt
       contains:
         - Applied 3 variants
+    # Test if boundary variants are included/excluded based on the specified
+    # region
+    - path: sample3/sample3_no_homref.vcf
+      contains:
+        - "chrM\t539"
+      must_not_contain:
+        - "chrM\t750"
 
 # Test the pipeline with multiple samples
 - name: integration-two-samples

@@ -34,4 +34,7 @@ The following settings are required:
 `--config pepfile=pepfile.yml reference=/path/to/ref.fa`
 
 ## Limitations
-* Only VCF files phased by [WhatsHap](https://whatshap.readthedocs.io/en/latest/) are currently supported.
+* Only VCF files phased by
+[WhatsHap](https://whatshap.readthedocs.io/en/latest/) are currently supported.
+* Only VCF files that are compressed with bgzip and indexe with tabix are
+currently supported

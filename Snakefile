@@ -23,10 +23,15 @@ rule all:
 
 
 rule exclude_homref:
+    """ Exclude homref calls, and restrict the output VCF file to the specified
+    region. This saves runtime on larg VCF files
+    """
     input:
         vcf=get_vcf,
     output:
         vcf="{sample}/{sample}_no_homref.vcf",
+    params:
+        region=f"--regions {config['region']}" if "region" in config else "",
     log:
         "log/{sample}_exclude_homref.txt",
     container:
@@ -35,6 +40,7 @@ rule exclude_homref:
         """
         bcftools view \
             --include 'GT[*]="alt"' \
+            {params.region} \
             {input.vcf} > {output.vcf} 2> {log}
         """
 

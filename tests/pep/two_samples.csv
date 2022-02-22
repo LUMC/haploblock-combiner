@@ -1,3 +1,3 @@
 sample_name,vcf
-sample1,tests/data/empty.vcf
-sample2,tests/data/unphased.vcf
+sample1,tests/data/empty.vcf.gz
+sample2,tests/data/unphased.vcf.gz

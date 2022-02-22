@@ -10,6 +10,7 @@ that users understand how the changes affect the new version.
 
 v0.0.1
 ---------------------------
++ Require bgzipped, tabix-indexed VCF files as input.
 + Add support for specifying a region to act on.
 + Add support for project configuration using
 [PEP](http://pep.databio.org/en/latest/).

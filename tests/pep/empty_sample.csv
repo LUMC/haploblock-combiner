@@ -1,2 +1,2 @@
 sample_name,vcf
-sample1,tests/data/empty.vcf
+sample1,tests/data/empty.vcf.gz

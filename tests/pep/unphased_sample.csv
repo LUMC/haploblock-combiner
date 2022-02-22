@@ -1,2 +1,2 @@
 sample_name,vcf
-sample2,tests/data/unphased.vcf
+sample2,tests/data/unphased.vcf.gz
