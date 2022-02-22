@@ -214,6 +214,15 @@ if __name__ == "__main__":
         "WARN": logging.WARN,
         "ERROR": logging.ERROR,
     }
+
     logging.basicConfig(level=log_levels[args.log_level])
+    root = logging.getLogger()
+    handler = root.handlers[0]
+
+    # Create log format
+    formatter = logging.Formatter(
+        "%(levelname)s:%(name)s:%(funcName)s:%(lineno)d - %(message)s"
+    )
+    handler.setFormatter(formatter)
 
     main(args)
