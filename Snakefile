@@ -17,7 +17,9 @@ config = default
 
 rule all:
     input:
-        fasta=expand("{sample}/fasta_files.txt", sample=pep.sample_table["sample_name"]),
+        final_files=expand(
+            "{sample}/final_files.txt", sample=pep.sample_table["sample_name"]
+        ),
 
 
 rule exclude_homref:
@@ -90,11 +92,33 @@ rule apply_variants:
         """
 
 
-rule gather_fasta:
+rule fasta_to_seq:
+    input:
+        fasta="{sample}/fasta/{i}_{ab}_all.fasta",
+        src=srcdir("scripts/fasta_to_seq.py"),
+    output:
+        seq="{sample}/seq/{i}_{ab}_all.seq",
+    params:
+        "--reverse-complement",
+    log:
+        "log/{sample}/seq_{i}_{ab}_all.txt",
+    container:
+        containers["pyfasta"]
+    shell:
+        """
+        mkdir -p $(dirname {output.seq})
+
+        python {input.src} \
+            --fasta {input.fasta} \
+            {params} > {output.seq} 2> {log}
+        """
+
+
+rule gather_final_outputs:
     input:
         gather_final_output,
     output:
-        "{sample}/fasta_files.txt",
+        "{sample}/final_files.txt",
     log:
         "log/{sample}_gather.txt",
     container:

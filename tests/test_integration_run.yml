@@ -19,10 +19,10 @@
     - path: sample1/sample1_no_homref.vcf
     - path: sample1/fasta/0_A_all.fasta
     - path: sample1/fasta/0_B_all.fasta
-    - path: sample1/fasta_files.txt
+    - path: sample1/final_files.txt
       contains:
-        - 0_A_all.fasta
-        - 0_B_all.fasta
+        - 0_A_all.seq
+        - 0_B_all.seq
 
 # Test the pipeline with an unphased vcf file
 - name: integration-unphased
@@ -63,12 +63,12 @@
     - path: sample3/combinations/1_A.vcf.gz
     - path: sample3/combinations/0_B.vcf.gz
     - path: sample3/combinations/1_B.vcf.gz
-    - path: sample3/fasta_files.txt
+    - path: sample3/final_files.txt
       contains:
-        - 0_A_all.fasta
-        - 1_A_all.fasta
-        - 0_B_all.fasta
-        - 1_B_all.fasta
+        - 0_A_all.seq
+        - 1_A_all.seq
+        - 0_B_all.seq
+        - 1_B_all.seq
 
 # Test the pipeline in a specific chromosome
 - name: integration-region-chrM
