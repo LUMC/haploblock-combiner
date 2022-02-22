@@ -107,7 +107,8 @@ def work(vcf_in, prefix):
             output[f"{rec.pos}_X"] = []
 
     for rec in vcf_in.fetch():
-        assert rec.info["AC"] in [(1,), (2,)]
+        msg = f"{rec.chrom}:{rec.pos}"
+        assert rec.info["AC"] in [(1,), (2,)], msg
 
         # print(rec)
         sample = rec.samples[0]
