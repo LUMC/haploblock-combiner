@@ -121,3 +121,24 @@
     - path: log/sample3_fasta_0_A.txt
       contains:
         - Applied 3 variants
+
+# Test the pipeline with multiple samples
+- name: integration-two-samples
+  tags:
+    - integration
+  command: >
+    snakemake
+      --reason
+      --printshellcmds
+      --jobs 1
+      --latency-wait 120
+      --use-singularity --singularity-args ' --cleanenv --bind /tmp'
+      --config
+        pepfile=tests/pep/project_config_two_samples.yaml
+        reference=tests/data/ref.fa
+        region=chrM:1-545
+      --snakefile Snakefile
+  files:
+    # Test that we applied only the variants at the start of chrM
+    - path: sample1/final_files.txt
+    - path: sample2/final_files.txt
