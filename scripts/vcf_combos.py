@@ -97,7 +97,7 @@ def work(vcf_in, prefix):
     for rec in vcf_in.fetch():
         logging.debug(f"{rec.chrom}:{rec.pos}")
         if rec.info["AC"] not in [(1,), (2,)]:
-            msg = f"{rec.chrom}:{rec.pos} has AC={rec.info['AC']}, skipping"
+            msg = f"{rec.chrom}:{rec.pos} has AC={rec.info['AC']}, skipping variant completely"
             logging.warning(msg)
             continue
 
@@ -154,14 +154,14 @@ def work(vcf_in, prefix):
     unique_pairs = []
     for path in results:
 
-        logging.info(path)
+        logging.debug(path)
         alt_path = []
         for ps in path:
             m = {"A": "B", "B": "A", "HET": "X", "X": "HET", "HOM": "HOM"}
             pos, suffix = ps.split("_")
             alt = f"{pos}_{m[suffix]}"
             alt_path.append(alt)
-            logging.info(f"{ps} {alt}")
+            logging.debug(f"{ps} {alt}")
 
         if (path, alt_path) not in unique_pairs and (
             alt_path,
@@ -183,6 +183,7 @@ def work(vcf_in, prefix):
 
         vcf1_out.close()
         vcf2_out.close()
+    logging.info(f"Created {index} file pairs in {prefix}")
 
 
 def test():
@@ -202,15 +203,16 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Validate pairs.")
     parser.add_argument("filename", help="vcf file")
     parser.add_argument("output", help="output dir file")
-    parser.add_argument('--log-level', choices=['DEBUG', 'INFO', 'WARN',
-    'ERROR'], default='WARN')
+    parser.add_argument(
+        "--log-level", choices=["DEBUG", "INFO", "WARN", "ERROR"], default="INFO"
+    )
     args = parser.parse_args()
 
     log_levels = {
-            'DEBUG': logging.DEBUG,
-            'INFO': logging.INFO,
-            'WARN': logging.WARN,
-            'ERROR': logging.ERROR
+        "DEBUG": logging.DEBUG,
+        "INFO": logging.INFO,
+        "WARN": logging.WARN,
+        "ERROR": logging.ERROR,
     }
     logging.basicConfig(level=log_levels[args.log_level])
 
