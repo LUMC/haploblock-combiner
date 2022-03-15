@@ -2,7 +2,6 @@ containers = {
     "haploblock-shuffler": "docker://quay.io/redmar_van_den_berg/haploblock-shuffler:0.0.5",
     # bcftools 1.10.2, samtools 1.10, both using htslib 1.10.2
     "bcftools": "docker://quay.io/biocontainers/mulled-v2-03d30cf7bcc23ba5d755e498a98359af8a2cd947:40ff43e422729149fe4c282ed29f2513644857f0-0",
-    # "bcftools": "docker://quay.io/biocontainers/bcftools:1.15--h0ea216a_2",
     "pyfasta": "docker://quay.io/biocontainers/pyfasta:0.5.2--py_1",
 }
 default = {}
