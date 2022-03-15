@@ -45,78 +45,85 @@ rule exclude_homref:
         """
 
 
-checkpoint vcf_combo:
+checkpoint haploblock_shuffler:
     input:
         vcf=rules.exclude_homref.output.vcf,
-        src=srcdir("scripts/vcf_combos.py"),
     output:
         folder=directory("{sample}/combinations"),
     log:
-        "log/{sample}_vcf_combo.txt",
+        "log/{sample}_haploblock_shuffler.txt",
     container:
-        containers["pysam"]
+        containers["haploblock-shuffler"]
     shell:
         """
-        mkdir -p {output.folder}
-        python {input.src} \
-            {input.vcf} {output.folder} 2>&1 > {log}
+        haploblock-shuffler \
+            {input.vcf} \
+            {output.folder} 2>&1 > {log}
+
+        shopt -s nullglob
+        for vcf in {output.folder}/out_*.vcf; do
+            bgzip $vcf && tabix -p vcf $vcf.gz
+        done 2>&1 >> {log}
         """
 
 
 rule apply_variants:
     input:
-        vcf="{sample}/combinations/{i}_{ab}.vcf.gz",
+        vcf="{sample}/combinations/out_{i}.vcf.gz",
         ref=config["reference"],
     output:
-        fasta="{sample}/fasta/{i}_{ab}_all.fasta",
-        tbi="{sample}/combinations/{i}_{ab}.vcf.gz.tbi",
+        hap1="{sample}/fasta/{i}_hap1.fasta",
+        hap2="{sample}/fasta/{i}_hap2.fasta",
     params:
         region=config.get("region", ""),
     log:
-        "log/{sample}_fasta_{i}_{ab}.txt",
+        "log/{sample}_apply_variants_{i}.txt",
     container:
         containers["bcftools"]
     shell:
         """
         # Create the output folder
-        mkdir -p $(dirname {output.fasta}) 2> {log}
-
-        # Index the vcf input file
-        tabix --force --preset vcf {input.vcf}
+        mkdir -p $(dirname {output.hap1}) 2> {log}
 
         if [ -z {params.region} ]; then
             cat {input.ref} |
-            bcftools consensus \
-                --haplotype A \
-                {input.vcf} > {output.fasta} 2>> {log}
+            bcftools consensus --haplotype 1 {input.vcf} > {output.hap1} 2>> {log}
+            bcftools consensus --haplotype 2 {input.vcf} > {output.hap2} 2>> {log}
         else
             samtools faidx {input.ref} {params.region} |
-            bcftools consensus \
-                --haplotype A \
-                {input.vcf} > {output.fasta} 2>> {log}
+            bcftools consensus --haplotype 1 {input.vcf} > {output.hap1} 2>> {log}
+            bcftools consensus --haplotype 2 {input.vcf} > {output.hap2} 2>> {log}
+        fi
+
+        # Workaround for a bug in bcftools, where hap2 is empty when there are
+        # no variants.
+        # See https://github.com/samtools/bcftools/issues/1676
+        if [ ! -s {output.hap2} ]; then
+            cp {output.hap1} {output.hap2}
         fi
         """
 
 
 rule fasta_to_seq:
     input:
-        fasta="{sample}/fasta/{i}_{ab}_all.fasta",
+        hap1=rules.apply_variants.output.hap1,
+        hap2=rules.apply_variants.output.hap2,
         src=srcdir("scripts/fasta_to_seq.py"),
     output:
-        seq="{sample}/seq/{i}_{ab}_all.seq",
+        seq1="{sample}/seq/{i}_hap1.seq",
+        seq2="{sample}/seq/{i}_hap2.seq",
     params:
         "--reverse-complement",
     log:
-        "log/{sample}/seq_{i}_{ab}_all.txt",
+        "log/{sample}/fasta_to_seq_{i}.txt",
     container:
         containers["pyfasta"]
     shell:
         """
-        mkdir -p $(dirname {output.seq})
+        mkdir -p $(dirname {output.seq1})
 
-        python {input.src} \
-            --fasta {input.fasta} \
-            {params} > {output.seq} 2> {log}
+        python {input.src} --fasta {input.hap1} {params} > {output.seq1} 2> {log}
+        python {input.src} --fasta {input.hap2} {params} > {output.seq2} 2>> {log}
         """
 
 

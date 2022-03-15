@@ -14,15 +14,14 @@
         reference=tests/data/ref.fa
       --snakefile Snakefile
   files:
-    - path: sample1/combinations/0_A.vcf.gz
-    - path: sample1/combinations/0_B.vcf.gz
+    - path: sample1/combinations/out_0.vcf.gz
     - path: sample1/sample1_no_homref.vcf
-    - path: sample1/fasta/0_A_all.fasta
-    - path: sample1/fasta/0_B_all.fasta
+    - path: sample1/fasta/0_hap1.fasta
+    - path: sample1/fasta/0_hap2.fasta
     - path: sample1/final_files.txt
       contains:
-        - 0_A_all.seq
-        - 0_B_all.seq
+        - sample1/seq/0_hap1.seq
+        - sample1/seq/0_hap1.seq
 
 # Test the pipeline with an unphased vcf file
 - name: integration-unphased
@@ -40,8 +39,10 @@
         reference=tests/data/ref.fa
       --snakefile Snakefile
   files:
-    - path: sample2/combinations/0_A.vcf.gz
-    - path: sample2/combinations/0_B.vcf.gz
+    - path: sample2/combinations/out_0.vcf.gz
+    # All variants should group together, so we expect to get one output file
+    - path: sample2/combinations/out_1.vcf.gz
+      should_exist: False
 
 # Test the pipeline with a phased vcf file
 - name: integration-phased
@@ -59,16 +60,18 @@
         reference=tests/data/ref.fa
       --snakefile Snakefile
   files:
-    - path: sample3/combinations/0_A.vcf.gz
-    - path: sample3/combinations/1_A.vcf.gz
-    - path: sample3/combinations/0_B.vcf.gz
-    - path: sample3/combinations/1_B.vcf.gz
+    - path: sample3/combinations/out_0.vcf.gz
+    - path: sample3/combinations/out_1.vcf.gz
+    # There are two phase groups in the file, so we should only get 2 output
+    # files
+    - path: sample3/combinations/out_2.vcf.gz
+      should_exist: false
     - path: sample3/final_files.txt
       contains:
-        - 0_A_all.seq
-        - 1_A_all.seq
-        - 0_B_all.seq
-        - 1_B_all.seq
+        - sample3/seq/0_hap1.seq
+        - sample3/seq/0_hap2.seq
+        - sample3/seq/1_hap1.seq
+        - sample3/seq/1_hap2.seq
 
 # Test the pipeline in a specific chromosome
 - name: integration-region-chrM
@@ -92,7 +95,7 @@
       - "[ -z chrM ]"
   files:
     # Test that we applied all variants in chrM
-    - path: log/sample3_fasta_0_A.txt
+    - path: log/sample3_apply_variants_0.txt
       contains:
       - Applied 16 variants
 
@@ -118,7 +121,7 @@
       - "[ -z chrM:1-545 ]"
   files:
     # Test that we applied only the variants at the start of chrM
-    - path: log/sample3_fasta_0_A.txt
+    - path: log/sample3_apply_variants_0.txt
       contains:
         - Applied 3 variants
     # Test if boundary variants are included/excluded based on the specified
