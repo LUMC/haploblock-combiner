@@ -88,18 +88,15 @@ rule apply_variants:
         if [ -z {params.region} ]; then
             cat {input.ref} |
             bcftools consensus --haplotype 1 {input.vcf} > {output.hap1} 2>> {log}
+
+            cat {input.ref} |
             bcftools consensus --haplotype 2 {input.vcf} > {output.hap2} 2>> {log}
         else
             samtools faidx {input.ref} {params.region} |
             bcftools consensus --haplotype 1 {input.vcf} > {output.hap1} 2>> {log}
-            bcftools consensus --haplotype 2 {input.vcf} > {output.hap2} 2>> {log}
-        fi
 
-        # Workaround for a bug in bcftools, where hap2 is empty when there are
-        # no variants.
-        # See https://github.com/samtools/bcftools/issues/1676
-        if [ ! -s {output.hap2} ]; then
-            cp {output.hap1} {output.hap2}
+            samtools faidx {input.ref} {params.region} |
+            bcftools consensus --haplotype 2 {input.vcf} > {output.hap2} 2>> {log}
         fi
         """
 
