@@ -10,6 +10,7 @@ that users understand how the changes affect the new version.
 
 v0.0.1
 ---------------------------
++ Make specifying a region mandatory for the pipeline.
 + Use haplotype-shuffler instead of vcf-combo script.
 + Require bgzipped, tabix-indexed VCF files as input.
 + Add support for specifying a region to act on.

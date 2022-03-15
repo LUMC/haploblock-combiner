@@ -31,7 +31,7 @@ rule exclude_homref:
     output:
         vcf="{sample}/{sample}_no_homref.vcf",
     params:
-        region=f"--regions {config['region']}" if "region" in config else "",
+        region=f"--regions {config['region']}",
     log:
         "log/{sample}_exclude_homref.txt",
     container:
@@ -75,7 +75,7 @@ rule apply_variants:
         hap1="{sample}/fasta/{i}_hap1.fasta",
         hap2="{sample}/fasta/{i}_hap2.fasta",
     params:
-        region=config.get("region", ""),
+        region=config["region"],
     log:
         "log/{sample}_apply_variants_{i}.txt",
     container:
@@ -85,19 +85,11 @@ rule apply_variants:
         # Create the output folder
         mkdir -p $(dirname {output.hap1}) 2> {log}
 
-        if [ -z {params.region} ]; then
-            cat {input.ref} |
-            bcftools consensus --haplotype 1 {input.vcf} > {output.hap1} 2>> {log}
+        samtools faidx {input.ref} {params.region} |
+        bcftools consensus --haplotype 1 {input.vcf} > {output.hap1} 2>> {log}
 
-            cat {input.ref} |
-            bcftools consensus --haplotype 2 {input.vcf} > {output.hap2} 2>> {log}
-        else
-            samtools faidx {input.ref} {params.region} |
-            bcftools consensus --haplotype 1 {input.vcf} > {output.hap1} 2>> {log}
-
-            samtools faidx {input.ref} {params.region} |
-            bcftools consensus --haplotype 2 {input.vcf} > {output.hap2} 2>> {log}
-        fi
+        samtools faidx {input.ref} {params.region} |
+        bcftools consensus --haplotype 2 {input.vcf} > {output.hap2} 2>> {log}
         """
 
 

@@ -12,6 +12,7 @@
       --config
         pepfile=tests/pep/project_config_empty.yaml
         reference=tests/data/ref.fa
+        region=chrM
       --snakefile Snakefile
   files:
     - path: sample1/combinations/out_0.vcf.gz
@@ -37,6 +38,7 @@
       --config
         pepfile=tests/pep/project_config_unphased.yaml
         reference=tests/data/ref.fa
+        region=chrM
       --snakefile Snakefile
   files:
     - path: sample2/combinations/out_0.vcf.gz
@@ -58,6 +60,7 @@
       --config
         pepfile=tests/pep/project_config_phased.yaml
         reference=tests/data/ref.fa
+        region=chrM
       --snakefile Snakefile
   files:
     - path: sample3/combinations/out_0.vcf.gz
@@ -91,8 +94,8 @@
       --snakefile Snakefile
   stderr:
     contains:
-      # Here we use a bash test in the shell to check if a region was specified
-      - "[ -z chrM ]"
+      # Make sure to pass the specified region to samtools
+      - "samtools faidx tests/data/ref.fa chrM"
   files:
     # Test that we applied all variants in chrM
     - path: log/sample3_apply_variants_0.txt
@@ -117,8 +120,8 @@
       --snakefile Snakefile
   stderr:
     contains:
-      # Here we use a bash test in the shell to check if a region was specified
-      - "[ -z chrM:1-545 ]"
+      # Make sure to pass the specified region to samtools
+      - "samtools faidx tests/data/ref.fa chrM:1-545"
   files:
     # Test that we applied only the variants at the start of chrM
     - path: log/sample3_apply_variants_0.txt

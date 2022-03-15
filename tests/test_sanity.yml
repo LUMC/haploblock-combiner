@@ -22,6 +22,7 @@
       --config
         pepfile=tests/pep/project_config_empty.yaml
         reference=tests/data/ref.fa
+        region=chrM
 
 - name: sanity-snakefmt
   tags:

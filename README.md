@@ -31,7 +31,12 @@ of priority.
 
 ## Usage
 The following settings are required:
-`--config pepfile=pepfile.yml reference=/path/to/ref.fa`
+`--config pepfile=pepfile.yml reference=/path/to/ref.fa region=chrM`
+
+**Note:** Please make sure to specify as small a region as possible. This
+pipeline will generate 2^(n-1) files, where n is determined by the number of
+phase sets in the input VCF. So for an unphased VCF with 20 heterozygous
+variants, it will generate over **1 million files**.
 
 ## Limitations
 * Only VCF files phased by
