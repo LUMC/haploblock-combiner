@@ -50,6 +50,7 @@ checkpoint haploblock_shuffler:
         vcf=rules.exclude_homref.output.vcf,
     output:
         folder=directory("{sample}/combinations"),
+    params: config["max_blocks"],
     log:
         "log/{sample}_haploblock_shuffler.txt",
     container:
@@ -57,6 +58,7 @@ checkpoint haploblock_shuffler:
     shell:
         """
         haploblock-shuffler \
+            --max-blocks {params} \
             {input.vcf} \
             {output.folder} 2>&1 > {log}
 

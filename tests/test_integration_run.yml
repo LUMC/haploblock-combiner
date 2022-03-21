@@ -23,6 +23,9 @@
       contains:
         - sample1/seq/0_hap1.seq
         - sample1/seq/0_hap1.seq
+  stderr:
+    contains:
+      - "--max-blocks 11"
 
 # Test the pipeline with an unphased vcf file
 - name: integration-unphased
@@ -39,12 +42,16 @@
         pepfile=tests/pep/project_config_unphased.yaml
         reference=tests/data/ref.fa
         region=chrM
+        max_blocks=7
       --snakefile Snakefile
   files:
     - path: sample2/combinations/out_0.vcf.gz
     # All variants should group together, so we expect to get one output file
     - path: sample2/combinations/out_1.vcf.gz
       should_exist: False
+  stderr:
+    contains:
+      - "--max-blocks 7"
 
 # Test the pipeline with a phased vcf file
 - name: integration-phased
