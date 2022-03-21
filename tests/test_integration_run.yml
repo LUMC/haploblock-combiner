@@ -19,10 +19,9 @@
     - path: sample1/sample1_no_homref.vcf
     - path: sample1/fasta/0_hap1.fasta
     - path: sample1/fasta/0_hap2.fasta
-    - path: sample1/final_files.txt
-      contains:
-        - sample1/seq/0_hap1.seq
-        - sample1/seq/0_hap1.seq
+    - path: sample1/seq/0_hap1.seq
+    - path: sample1/seq/0_hap1.seq
+    - path: sample1/dummy_file.txt
   stderr:
     contains:
       - "--max-blocks 11"
@@ -72,16 +71,15 @@
   files:
     - path: sample3/combinations/out_0.vcf.gz
     - path: sample3/combinations/out_1.vcf.gz
+    - path: sample3/seq/0_hap1.seq
+    - path: sample3/seq/0_hap2.seq
+    - path: sample3/seq/1_hap1.seq
+    - path: sample3/seq/1_hap2.seq
     # There are two phase groups in the file, so we should only get 2 output
     # files
     - path: sample3/combinations/out_2.vcf.gz
       should_exist: false
-    - path: sample3/final_files.txt
-      contains:
-        - sample3/seq/0_hap1.seq
-        - sample3/seq/0_hap2.seq
-        - sample3/seq/1_hap1.seq
-        - sample3/seq/1_hap2.seq
+    - path: sample3/dummy_file.txt
 
 # Test the pipeline in a specific chromosome
 - name: integration-region-chrM
@@ -160,5 +158,5 @@
       --snakefile Snakefile
   files:
     # Test that we applied only the variants at the start of chrM
-    - path: sample1/final_files.txt
-    - path: sample2/final_files.txt
+    - path: sample1/dummy_file.txt
+    - path: sample2/dummy_file.txt

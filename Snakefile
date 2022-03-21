@@ -17,8 +17,8 @@ config = default
 
 rule all:
     input:
-        final_files=expand(
-            "{sample}/final_files.txt", sample=pep.sample_table["sample_name"]
+        dummy_files=expand(
+            "{sample}/dummy_file.txt", sample=pep.sample_table["sample_name"]
         ),
 
 
@@ -50,7 +50,8 @@ checkpoint haploblock_shuffler:
         vcf=rules.exclude_homref.output.vcf,
     output:
         folder=directory("{sample}/combinations"),
-    params: config["max_blocks"],
+    params:
+        config["max_blocks"],
     log:
         "log/{sample}_haploblock_shuffler.txt",
     container:
@@ -119,18 +120,16 @@ rule fasta_to_seq:
 
 
 rule gather_final_outputs:
+    """ Dummy rule that gathers all checkpoint output """
     input:
         gather_final_output,
     output:
-        "{sample}/final_files.txt",
+        "{sample}/dummy_file.txt",
     log:
         "log/{sample}_gather.txt",
     container:
         containers["bcftools"]
     shell:
         """
-        rm -f {output}
-        for file in {input}; do
-            echo $file >> {output}
-        done
+        touch {output}
         """
