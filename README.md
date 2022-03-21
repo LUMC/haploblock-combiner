@@ -29,6 +29,14 @@ of priority.
    `haploblock-combiner`
 3. The default settings for the pipeline, as specified in the `common.smk` file
 
+|Setting | Required | Default | Description|
+|--- | --- | --- | ---|
+|pepfile | yes | None | PEP project configuration file|
+|reference | yes | None | Reference file, must match the VCF|
+|region | no | None | Region of the VCF to act on|
+|max_blocks | no | 11 | Limit on the number of phase blocks|
+
+
 ## Usage
 The following settings are required:
 `--config pepfile=pepfile.yml reference=/path/to/ref.fa region=chrM`
